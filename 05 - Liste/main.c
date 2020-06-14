@@ -84,7 +84,7 @@ int main(void) {
                 \n\t(5) Process first order in queue (Tail Pop) and prepare it for delivery (POP in stack) \
                 \n\t(6) Print order queue status \
                 \n\t(7) Print delivery stack status\
-                \n\n\t(8) Exit");
+                \n\n\t(0) Exit");
         printf("\nChoice : ");
 
         do {
@@ -146,7 +146,7 @@ int main(void) {
             printStack(&stack);
             break;
         }
-        case 8: {
+        case 0: {
             cycle = false;
             printf("\nGoodbye");
             exit(0);

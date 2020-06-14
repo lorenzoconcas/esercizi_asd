@@ -88,8 +88,7 @@ int main(){
                 printf("\nEnter name of TV Series : ");
                 char name[DIM_NAME];
                 scanf("%s", name);
-                getchar();
-                printf("%s", name);
+                getchar();              
                 serie = findTVSeries(&p, name);
                 if(serie == NULL)
                     printf("\nTV Series not found");

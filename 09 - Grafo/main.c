@@ -83,12 +83,12 @@ int main(){
                 \n\n\t(0) : Exit\
                 \n\nChoice : ");
 
-       do{
+        do{
             scanf("%d",&choice);
             getchar();
             if(choice < 0 || choice > 9)
                 printf("\nInvalid choice\nChoice : ");
-       }while(choice < 0 || choice > 9);
+        }while(choice < 0 || choice > 9);
 
         switch(choice){
             case 1:{

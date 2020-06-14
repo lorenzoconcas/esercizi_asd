@@ -5,8 +5,7 @@
 #define DIM_HEAP 50
 
 //stuttura che rappresenta un Pronto soccorso
-typedef struct
-{
+typedef struct{
     int numeroB;
     int numeroG;
     int numeroV;
@@ -26,13 +25,15 @@ typedef struct
 
 //funzione che chiede i dati relativi ad un nuovo paziente e lo restituisce (con la priorita' gia' impostata) pronto per essere inserito nella coda con priorita' (heap)
 Paziente nuovoPaziente(ProntoSoccorso *ps);
-//
-char codeName[][6] = {"BIANCO", "VERDE", "GIALLO", "ROSSO"} ;
-int priorita(Paziente p1, Paziente p2);
-void insert_heap(Paziente * coda, Paziente p, int *size);
-void delete_heap();
-void print_heap(Paziente *heap, int size);
-void clearScreen();
+//funzioni studente
+char     codeName[][7]   =  {"BIANCO", "VERDE", "GIALLO", "ROSSO"} ;
+int      priorita           (Paziente p1, Paziente p2);
+void     insert_heap        (Paziente * coda, Paziente p, int *size);
+Paziente delete_heap        (Paziente heap[], int* dim);
+void     print_heap         (Paziente *heap, int size);
+void     printPaziente      (Paziente p);
+void     clearScreen        ();
+
 int main()
 {
   //inizializzazione pronto soccorso
@@ -41,18 +42,21 @@ int main()
 
     //inizializzazione della Coda con priorita'
     Paziente codaPrio[DIM_HEAP];
-    int dim_coda = 0;
-   
+
+    int heap_size = 0;
+    int *heap_size_pointer = &heap_size;
+    
     int choice = -1;
     do{
         clearScreen();
         printf("\nEmergency Department");
+        printf("\nThere area currently (%d) patients\n", heap_size);
         printf("\n\t(1) Insert patient \
                 \n\t(2) Print patients order\
-                \n\t(3) Remove patient\
+                \n\t(3) Remove next patient\
                 \n\n\t(0) Exit");
         do{
-            printf("\nChoice : ");
+            printf("\n\nChoice : ");
             scanf("%d", &choice);
             getchar();
             if(choice < 0 || choice > 3)
@@ -61,19 +65,32 @@ int main()
 
         switch(choice){
             case 1:{
-                insert_heap(codaPrio, nuovoPaziente(&ps), &dim_coda);
+                insert_heap(codaPrio, nuovoPaziente(&ps), heap_size_pointer);
                 break;
             }
             case 2:{
-                print_heap(codaPrio, dim_coda);
+                printf("\nPatients in queue (heap)\n");
+                print_heap(codaPrio, heap_size);
                 break;
             }
             case 3:{
+                if(heap_size != 0){
+                    printf("Removing patient");
+                    Paziente paziente = delete_heap(codaPrio, heap_size_pointer);
+                    printPaziente(paziente);
+                    printf("\n");
+                    printf("\nRemaining patients : ");
+                    print_heap(codaPrio, heap_size);
+                }
+                else printf("\nEmpty heap");
                 break;
             }
         }
-        printf("\nPress any key to continue");
-        getchar();
+        if(choice != 0){
+            printf("\nPress any key to continue");
+            getchar();
+        }
+        
     }while(choice != 0);
     return 0;
 }
@@ -122,16 +139,9 @@ Paziente nuovoPaziente(ProntoSoccorso *ps)
 }
 
 int priorita(Paziente p1, Paziente p2){
-   /* if(p1.codice > p2.codice)
-        return 1;
-    else if(p1.codice == p2.codice && p1.ordine < p2.ordine)
-            return 1;*/
-    // return 0;
-    return ((p1.codice > p2.codice) || \
+       return ((p1.codice > p2.codice) || \
            (p1.codice == p2.codice && p1.ordine < p2.ordine))\
-           ? 1 : 0;
-
-   
+           ? 1 : 0;  
 }
 void insert_heap(Paziente * coda, Paziente p, int *size){
     if(*size == DIM_HEAP){
@@ -145,12 +155,39 @@ void insert_heap(Paziente * coda, Paziente p, int *size){
         i /= 2;
     }
     coda[i] = p;
+    
+    printPaziente(coda[i]);
+   
 }
-void delete_heap(){}
+Paziente delete_heap(Paziente heap[], int* dim){
+    Paziente item=heap[1], temp=heap[*dim];
+    int padre=1,figlio=2;
+    *dim=*dim-1;
+
+    while(figlio <= *dim){
+        if (figlio < *dim && priorita(heap[figlio],heap[figlio + 1])==0)
+            figlio = figlio + 1;
+        if (priorita(temp,heap[figlio]))
+            break;
+
+        heap[padre] = heap[figlio];
+        padre = figlio;
+        figlio = 2 * figlio;
+    }
+    heap[padre] = temp;
+    return item;
+}
+
 void print_heap(Paziente *heap, int size){
-  for(int i = 0; i < size; i++)
-    printf("\nNome: %s\nCodice: %s\nOrdine d'arrivo: %d", heap[i].nome, heap[i].codice,heap[i].ordine);
+    for(int i = 1; i <= size; i++){
+        printPaziente(heap[i]);
+        printf("\n");
+    }
 }
+void printPaziente(Paziente p){
+    printf("\nNome: %s\nCodice: %s\nOrdine d'arrivo: %u", p.nome, codeName[p.codice], p.ordine);
+}
+
 void clearScreen(){
 #ifdef _WIN32
         system("cls");
