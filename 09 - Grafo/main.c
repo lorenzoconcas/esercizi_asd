@@ -70,7 +70,7 @@ int main(){
     //Inserire qui le chiamate per testare le varie funzioni e il menu'
     do{
         clearScreen();
-        printf("\nGraphs\
+        printf("Graphs\
                 \n\t(1) : Insert city\
                 \n\t(2) : Load test cities (oriented graph)\
                 \n\t(3) : Load test cities (un-oriented graph)\
@@ -235,8 +235,10 @@ int main(){
                 break;
             }
        }
-       printf("\nPress any key to continue");
-       getchar();
+        if(choice != 0){
+            printf("\nPress any key to continue");
+            getchar();
+        }      
     }while(choice!=0);
     printf("\nGoodbye");
     return 0;

@@ -61,9 +61,9 @@ int main(){
                 \n\t(7)  Search previus\
                 \n\t(8)  Search next\
                 \n\t(9)  ABR Depth\
-                \n\t(10) Inorder visit\
-                \n\t(11) Preorder visit\
-                \n\t(12) Postorder visit\
+                \n\t(10) Inorder visit (SVD)\
+                \n\t(11) Preorder visit (VSD)\
+                \n\t(12) Postorder visit (SVD)\
                 \n\n\t(0)  Exit");
         printf("\n\nChoice : ");
         do{

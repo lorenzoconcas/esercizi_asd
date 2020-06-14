@@ -187,7 +187,6 @@ void print_heap(Paziente *heap, int size){
 void printPaziente(Paziente p){
     printf("\nNome: %s\nCodice: %s\nOrdine d'arrivo: %u", p.nome, codeName[p.codice], p.ordine);
 }
-
 void clearScreen(){
 #ifdef _WIN32
         system("cls");

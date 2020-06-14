@@ -1,5 +1,5 @@
 echo off
-mkdir bin
+mkdir bin                            >nul 
 cls
 echo ASD Lab projects builder script
 echo Clearing workspace

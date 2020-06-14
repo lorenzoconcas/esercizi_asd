@@ -16,28 +16,117 @@ typedef struct nodo{
 }Nodo;
 
 
-void carica_auto_test(Nodo* parcheggio[]);
-//
-void inserisci_auto(Nodo *parcheggio[], Auto);
-int hash_code(char targa[]);
-void delete_auto(Nodo * parcheggio[], char * targa);
-void printAuto(Auto a);
-void printParking(Nodo *parcheggio[]);
-int countCars(Nodo *parcheggio[]);
+void carica_auto_test               (Nodo* parcheggio[]);
+//funzioni studente
+void inserisci_auto                 (Nodo *parcheggio[], Auto);
+int  hash_code                      (char targa[]);
+void delete_auto                    (Nodo * parcheggio[], char * targa);
+void printAuto                      (Auto a);
+void printParking                   (Nodo *parcheggio[]);
+void printLevel                     (Nodo *parcheggio, int level);
+int  countCars                      (Nodo *parcheggio[]);
+Auto find_auto                      (Nodo * parcheggio[], char * targa);
+void clearScreen                    ();
+
 int main(void){
     Nodo * parcheggio[NUM_PIANI], *temp;
     for(int i = 0; i < NUM_PIANI; i++)
         parcheggio[i] = NULL;
    
-    carica_auto_test(parcheggio);
+    int choice = -1;
+
+    do{
+        clearScreen();      
+        printf("Hash Table\
+                \n\t(1) : Insert Car\
+                \n\t(2) : Search Car\
+                \n\t(3) : Print parking\
+                \n\t(4) : Print level\
+                \n\t(5) : Load Test\
+                \n\t(6) : Remove Car\
+                \n\n\t(0) : Exit\
+                \n\nChoice : ");
+
+        do{
+            scanf("%d",&choice);
+            getchar();
+            if(choice < 0 || choice > 9)
+                printf("\nInvalid choice\nChoice : ");
+        }while(choice < 0 || choice > 9);
+
+        switch(choice){
+            case 1:{   
+                Auto car;
+                printf("\nInsert car plate number : ");
+                scanf("%s", car.targa);
+                getchar();
+                printf("\nInsert time of arrival\
+                        \nHour : ");
+                scanf("%d", &car.ora);
+                getchar();
+                printf("Minute : ");
+                scanf("%d", &car.min);
+                getchar();
+                printf("\nInserting car in level %d", hash_code(car.targa));
+                inserisci_auto(parcheggio, car);
+                break;
+            }
+            case 2:{   
+                char plate[MAX_TARGA];
+                printf("\nInsert car plate number : ");
+                scanf("%s", plate);
+                getchar();
+                Auto car = find_auto(parcheggio, plate);
+                if(strcmp(car.targa, plate) == 0){
+                    printf("Car found at level %d", hash_code(plate));
+                    printAuto(car);
+                }
+                break;
+            }
+            case 3:{
+                printf("\nAuto in parking : ");
+                printParking(parcheggio);
+                break;
+            }
+            case 4:{
+                int level = 0;
+                printf("\nPlease choose a level (0 - %d) : ", NUM_PIANI);
+                do{
+                    scanf("%d", &level);
+                    getchar();
+                    if(level < 0 || level > NUM_PIANI)
+                        printf("\nInvalid choice, try again : ");
+                }while(level < 0 || level > NUM_PIANI);
+                printLevel(parcheggio[level], level);
+                break;
+            }
+            case 5:{
+                printf("\nInserting test cars...");
+                carica_auto_test(parcheggio);
+                printf("\nDone!");
+                break;
+            }
+            case 6:{
+                char plate[MAX_TARGA];
+                printf("\nInsert car plate number : ");
+                scanf("%s", plate);
+                getchar();
+                Auto car = find_auto(parcheggio, plate);
+                if(strcmp(car.targa, plate) == 0){
+                   delete_auto(parcheggio, plate);
+                   printf("\nCar deleted successfully");
+                }
+                else printf("\nCar not found");
+                break;
+            }
+        }
+        if(choice != 0){
+            printf("\nPress any key to continue");
+            getchar();
+        }
+    }while(choice != 0);
    
-    printParking(parcheggio);
-    printf("\nFound %d cars\nDeleting auto", countCars(parcheggio));
-    delete_auto(parcheggio, "CA220TO");
-    printf("\nDeleted...");
-    printParking(parcheggio);
-    printf("\nFound %d cars", countCars(parcheggio));
-	
+	printf("\nDone Goodbye");
     return 0;
 }
 
@@ -66,7 +155,8 @@ void carica_auto_test(Nodo* parcheggio[]){
     inserisci_auto(parcheggio, a9);
     inserisci_auto(parcheggio, a10);
 }
-//
+
+//funzioni studente
 int hash_code(char targa[]){
 	int i = 0;
 	for(int j = 0; j < MAX_TARGA; j++)
@@ -92,7 +182,7 @@ void inserisci_auto(Nodo * parcheggio[], Auto car){
     temp->link = NULL;    
 }
 void printAuto(Auto a){
-    printf("Auto : %s %d:%d", a.targa, a.ora, a.min);
+    printf("Car : %s (arrived at %d:%d)", a.targa, a.ora, a.min);
 }
 void delete_auto(Nodo * parcheggio[], char * targa){
     //we need to search the auto first
@@ -103,7 +193,7 @@ void delete_auto(Nodo * parcheggio[], char * targa){
         free(parcheggio[location]);
         parcheggio[location] = node;
         return;
-    }else{//we need to find the previouse node of the car
+    }else{//we need to find the previous node of the car
         while(node->link != NULL){
             if(strcmp(node->link->info.targa, targa) == 0){
                 temp = node->link->link;//the node behind the one we want to free
@@ -113,24 +203,38 @@ void delete_auto(Nodo * parcheggio[], char * targa){
             }
             node = node->link;
         }
-    }
-  
+    }  
+}
+Auto find_auto(Nodo * parcheggio[], char * targa){
+    //we need to search the auto first
+    int location = hash_code(targa);
+    Nodo *node = parcheggio[location], *temp;
+    if(strcmp(node->info.targa, targa) == 0){
+        return node->info;      
+    }else{//we need to find the previous node of the car
+        while(node->link != NULL){
+           if(strcmp(node->info.targa, targa) == 0)
+                return node->info;      
+            node = node->link;
+        }
+    }      
 }
 void printParking(Nodo *parcheggio[]){
     Nodo *temp = NULL;
-    for(int i = 0; i < NUM_PIANI; i++){
-        temp = parcheggio[i];
-        printf("\nLevel (%d) ", i);
-        if(temp == NULL)
-            printf("empty");
-        else{
-            
-            printf(":");
-            while(temp != NULL){
-                printf("\n\t");
-                printAuto(temp->info);
-                temp = temp->link;
-            }
+    for(int i = 0; i < NUM_PIANI; i++)
+        printLevel(parcheggio[i], i);    
+}
+
+void printLevel(Nodo *parcheggio, int level){
+    printf("\nLevel (%d) ", level);
+    if(parcheggio == NULL)
+        printf(" is empty");
+    else{
+        printf(":");
+        while(parcheggio != NULL){
+            printf("\n\t");
+            printAuto(parcheggio->info);
+            parcheggio = parcheggio->link;
         }
     }
 }
@@ -146,4 +250,12 @@ int countCars(Nodo *parcheggio[]){
             }
     }
     return total;
+}
+
+void clearScreen(){
+#ifdef _WIN32
+        system("cls");
+#else
+        system("clear");
+#endif
 }
